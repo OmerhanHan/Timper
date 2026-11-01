@@ -1,0 +1,43 @@
+@font-face {
+  font-family: 'Press Start 2P';
+  src: url(fonts/press-start-2p-latin-400-normal.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131;
+}
+@font-face {
+  font-family: 'Press Start 2P';
+  src: url(fonts/press-start-2p-latin-ext-400-normal.woff2) format('woff2');
+  unicode-range: U+0100-0130, U+0132-02BA;
+}
+[hidden] { display: none !important; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: transparent; }
+canvas { position: fixed; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
+
+/* Konuşma balonu: piksel çerçeve ve aşağı bakan kuyruk */
+.bubble {
+  position: fixed;
+  padding: 16px 20px;
+  background: var(--panel);
+  color: var(--ink);
+  font: 28px/1 'Press Start 2P', monospace;
+  white-space: nowrap;
+  box-shadow: 0 -6px 0 0 var(--ink), 0 6px 0 0 var(--ink), -6px 0 0 0 var(--ink), 6px 0 0 0 var(--ink);
+  transform: translateX(-50%);
+  animation: pop .3s steps(3) both;
+}
+.bubble::after {
+  content: '';
+  position: absolute;
+  left: calc(50% - 6px);
+  bottom: -18px;
+  width: 12px;
+  height: 12px;
+  background: var(--panel);
+  box-shadow: 6px 0 0 0 var(--ink), -6px 0 0 0 var(--ink), 0 6px 0 0 var(--ink);
+}
+@keyframes pop {
+  from { transform: translateX(-50%) scale(0); }
+  to { transform: translateX(-50%) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bubble { animation: none; }
+}

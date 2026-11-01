@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'">
+  <title>Pixel Timer</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="titlebar">
+    <span class="titlebar-name">PIXEL TIMER</span>
+    <div class="titlebar-actions">
+      <button id="open-settings" class="icon-btn" title="Ayarlar" aria-label="Ayarlar">⚙</button>
+      <button id="hide-window" class="icon-btn" title="Gizle (sayaç arka planda çalışır)" aria-label="Pencereyi gizle">×</button>
+    </div>
+  </header>
+
+  <main id="view-timer" class="view" hidden>
+    <div class="stage-frame"><canvas id="stage" class="pixel-canvas"></canvas></div>
+    <div class="clock">
+      <div id="status-text" class="status-text"></div>
+      <div id="time" class="time" role="timer">25:00</div>
+    </div>
+
+    <section id="setup" class="stack">
+      <div id="presets" class="presets" role="group" aria-label="Önerilen süreler"></div>
+      <div class="stepper" role="group" aria-label="Özel süre">
+        <button id="minus" class="btn square" aria-label="1 dakika azalt">−</button>
+        <label class="stepper-value">
+          <input id="minutes" type="number" min="1" max="720" step="1" inputmode="numeric" aria-label="Süre, dakika">
+          <span>dk</span>
+        </label>
+        <button id="plus" class="btn square" aria-label="1 dakika artır">+</button>
+      </div>
+      <button id="start" class="btn primary large">BAŞLAT</button>
+    </section>
+
+    <section id="controls" class="stack" hidden>
+      <button id="pause" class="btn primary large">DURAKLAT</button>
+      <div class="row">
+        <button id="add-five" class="btn">+5 dk</button>
+        <button id="stop" class="btn">Durdur</button>
+      </div>
+      <p class="hint">Pencereyi kapatsan da sayaç arka planda çalışmaya devam eder.</p>
+    </section>
+
+    <section id="finished" class="stack" hidden>
+      <button id="done" class="btn primary large">TAMAM</button>
+      <button id="again" class="btn">5 dakika daha</button>
+    </section>
+  </main>
+
+  <main id="view-onboarding" class="view" hidden>
+    <ol id="steps" class="steps" aria-hidden="true"></ol>
+
+    <section data-step="welcome" class="step">
+      <div class="stage-frame"><canvas id="welcome-stage" class="pixel-canvas"></canvas></div>
+      <h1>Hoş geldin!</h1>
+      <p>Süreni seç, işine dön. Pixel Timer arka planda sayar, süre dolunca seni haberdar eder.</p>
+      <div class="step-actions"><button data-next class="btn primary large">BAŞLAYALIM</button></div>
+    </section>
+
+    <section data-step="theme" class="step" hidden>
+      <h1>Temanı seç</h1>
+      <p>Sonradan ayarlardan da değiştirebilirsin.</p>
+      <div class="theme-grid" data-theme-grid></div>
+      <div class="step-actions">
+        <button data-back class="btn">Geri</button>
+        <button data-next class="btn primary">İLERİ</button>
+      </div>
+    </section>
+
+    <section data-step="background" class="step" hidden>
+      <h1>Arka planda çalışsın mı?</h1>
+      <p>Bilgisayar açıldığında sessizce başlar, menü çubuğundaki saat simgesinde bekler. Pencereyi kapatmak sayacı durdurmaz.</p>
+      <div class="setting">
+        <div class="setting-text">
+          <strong id="ob-autostart-label">Bilgisayar açılınca başlat</strong>
+          <small data-autostart-note></small>
+        </div>
+        <button id="ob-autostart" class="switch" role="switch" aria-checked="true" aria-labelledby="ob-autostart-label"></button>
+      </div>
+      <div class="step-actions">
+        <button data-back class="btn">Geri</button>
+        <button data-next class="btn primary">İLERİ</button>
+      </div>
+    </section>
+
+    <section data-step="tracking" class="step" hidden>
+      <h1>Takip izni</h1>
+      <p>İleride çalışma sürelerini hangi uygulamada geçirdiğini gösterebilmek için etkinlik takibi eklenecek. Bunun için iznin gerekiyor.</p>
+      <ul class="facts">
+        <li>Bu sürümde hiçbir veri toplanmıyor.</li>
+        <li>İzin verirsen macOS, Erişilebilirlik iznini de sorar.</li>
+        <li>Kararını ayarlardan istediğin an değiştirebilirsin.</li>
+      </ul>
+      <div class="step-actions">
+        <button data-back class="btn">Geri</button>
+        <button id="ob-deny" class="btn">Şimdilik hayır</button>
+        <button id="ob-grant" class="btn primary">İzin ver</button>
+      </div>
+    </section>
+  </main>
+
+  <main id="view-settings" class="view scroll" hidden>
+    <div class="settings-head">
+      <button id="close-settings" class="btn small">← Geri</button>
+      <h1>Ayarlar</h1>
+    </div>
+
+    <h2>Tema</h2>
+    <div class="theme-grid" data-theme-grid></div>
+
+    <h2>Genel</h2>
+    <div class="setting">
+      <div class="setting-text">
+        <strong id="autostart-label">Bilgisayar açılınca başlat</strong>
+        <small data-autostart-note></small>
+      </div>
+      <button id="autostart" class="switch" role="switch" aria-checked="false" aria-labelledby="autostart-label"></button>
+    </div>
+    <div class="setting">
+      <div class="setting-text">
+        <strong id="sound-label">Bitiş sesi</strong>
+        <small>Süre dolunca temanın melodisini çalar.</small>
+      </div>
+      <button id="sound" class="switch" role="switch" aria-checked="true" aria-labelledby="sound-label"></button>
+    </div>
+
+    <h2>Süre bitimi</h2>
+    <div class="setting">
+      <div class="setting-text">
+        <strong id="mascot-label">Tema figürü masaüstüne gelsin</strong>
+        <small>Figür, açık olan her şeyin üzerinde "Süre doldu!" der. Tıklamaları engellemez.</small>
+      </div>
+      <button id="mascot" class="switch" role="switch" aria-checked="true" aria-labelledby="mascot-label"></button>
+    </div>
+    <button id="mascot-preview" class="btn">Şimdi önizle</button>
+
+    <h2>Takip izni</h2>
+    <div class="setting column">
+      <div class="setting-text">
+        <strong id="tracking-status"></strong>
+        <small id="tracking-detail"></small>
+      </div>
+      <div class="row">
+        <button id="tracking-grant" class="btn">İzin ver</button>
+        <button id="tracking-deny" class="btn">İzni kaldır</button>
+        <button id="tracking-open" class="btn">Sistem ayarları</button>
+      </div>
+    </div>
+
+    <h2>Uygulama</h2>
+    <div class="row">
+      <button id="replay-onboarding" class="btn">Tanıtımı tekrarla</button>
+      <button id="quit" class="btn">Çıkış</button>
+    </div>
+  </main>
+
+  <script src="../shared/themes.js"></script>
+  <script src="pixel.js"></script>
+  <script src="sound.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
